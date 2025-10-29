@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[Route('/api/meteo', name: 'api_meteo_')]
+#[Route('/api/meteo', name: 'api.meteo')]
 class MeteoController extends AbstractController
 {
     private MeteoClient $meteoClient;
@@ -43,8 +43,8 @@ class MeteoController extends AbstractController
 
         try {
             // Étape 2 : appel au service MeteoClient (avec cache memcached)
+            //$data = $this->meteoClient->fetchBasicWeather($ville);
             $data = $this->meteoClient->fetchWeather($ville);
-
             if (!$data) {
                 return $this->json([
                     'error' => "Aucune donnée météo trouvée pour la ville '{$ville}'."

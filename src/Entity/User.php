@@ -53,6 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->conseil = new ArrayCollection();
         $this->created_at = new \DateTimeImmutable();
+        $this->roles = ['ROLE_USER'];
     }
     // 🧩 Méthode obligatoire : identifiant unique
     public function getUserIdentifier(): string
