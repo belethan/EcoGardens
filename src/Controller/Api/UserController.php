@@ -26,7 +26,7 @@ final class UserController extends AbstractController
         ValidatorInterface $validator,
         UserPasswordHasherInterface $passwordHasher
     ): JsonResponse {
-        $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+        $data = json_decode($request->getContent(), true);
 
         if (!$data) {
             return $this->json(['error' => 'Requête invalide (JSON manquant ou incorrect).'], 400);
@@ -83,6 +83,7 @@ final class UserController extends AbstractController
                 'id' => $user->getId(),
                 'email' => $user->getEmail(),
                 'ville' => $user->getVille(),
+                'code_postal' => $user->getCodePostal(),
                 'created_at' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
             ]
         ], 201);

@@ -1,0 +1,9 @@
+services:
+    # Alias vers le pool Memcached dédié
+    App\Service\MeteoClient:
+        arguments:
+            $meteoCache: '@meteo.cache'
+            $apiKey: '%env(OWM_API_KEY)%'
+            $units: '%env(default:OWM_UNITS)%'
+            $countryCode: '%env(default:OWM_COUNTRY_CODE)%'
+            $baseUrl: '%env(default:OWM_BASE_URL)%'
