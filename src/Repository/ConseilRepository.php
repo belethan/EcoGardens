@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\conseil;
+use App\Entity\Conseil;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -13,7 +13,7 @@ class ConseilRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, conseil::class);
+        parent::__construct($registry, Conseil::class);
     }
 
     /**
@@ -45,5 +45,18 @@ class ConseilRepository extends ServiceEntityRepository
     {
         $now = new \DateTime();
         return $this->findByMoisAnnee((int) $now->format('m'), (int) $now->format('Y'));
+    }
+
+    public function existsForConseil(Conseil $conseil, int $mois, int $annee): bool
+    {
+        return (bool) $this->createQueryBuilder('t')
+            ->select('1')
+            ->andWhere('t.conseil = :c')
+            ->andWhere('t.mois = :m')
+            ->andWhere('t.annee = :a')
+            ->setParameters(['c' => $conseil, 'm' => $mois, 'a' => $annee])
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

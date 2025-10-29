@@ -3,13 +3,16 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
+/** @noinspection PhpUnused */
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -31,28 +34,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $code_postal = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $created_at = null;
+    private ?DateTimeImmutable $created_at;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTimeImmutable $updated_at = null;
+    private ?DateTimeImmutable $updated_at = null;
 
     /**
      * @var Collection<int, conseil>
      */
-    #[ORM\OneToMany(targetEntity: conseil::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $conseil;
+    #[ORM\OneToMany(targetEntity: Conseil::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $conseils;
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: "Le mot de passe est obligatoire.")]
     private ?string $password = null;
 
     #[ORM\Column(type: Types::JSON)]
-    private array $roles = [];
+    private array $roles ;
 
     public function __construct()
     {
-        $this->conseil = new ArrayCollection();
-        $this->created_at = new \DateTimeImmutable();
+        $this->conseils = new ArrayCollection();
+        $this->created_at = new DateTimeImmutable();
         $this->roles = ['ROLE_USER'];
     }
     // 🧩 Méthode obligatoire : identifiant unique
@@ -60,7 +63,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return (string) $this->email;
     }
-    // Pour compatibilité ascendante (facultatif mais conseillé)
+    // Pour compatibilité ascendante (facultatif, mais conseillé)
     public function getUsername(): string
     {
         return $this->getUserIdentifier();
@@ -142,24 +145,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $created_at): static
+    public function setCreatedAt(DateTimeImmutable $created_at): static
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updated_at): static
+    public function setUpdatedAt(?DateTimeImmutable $updated_at): static
     {
         $this->updated_at = $updated_at;
 
@@ -171,13 +174,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getConseil(): Collection
     {
-        return $this->conseil;
+        return $this->conseils;
     }
 
     public function addConseil(conseil $conseil): static
     {
-        if (!$this->conseil->contains($conseil)) {
-            $this->conseil->add($conseil);
+        if (!$this->conseils->contains($conseil)) {
+            $this->conseils->add($conseil);
             $conseil->setUser($this);
         }
 
@@ -186,11 +189,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function removeConseil(conseil $conseil): static
     {
-        if ($this->conseil->removeElement($conseil)) {
-            // set the owning side to null (unless already changed)
-            if ($conseil->getUser() === $this) {
-                $conseil->setUser(null);
-            }
+        if ($this->conseils->removeElement($conseil) && $conseil->getUser() === $this) {
+            $conseil->setUser(null);
         }
 
         return $this;

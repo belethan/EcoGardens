@@ -3,13 +3,14 @@
 namespace App\Entity;
 
 use App\Repository\ConseilRepository;
+use DateTimeImmutable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ConseilRepository::class)]
-class conseil
+class Conseil
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -20,24 +21,24 @@ class conseil
     private ?string $contenu = null;
 
     #[ORM\Column(name: 'created_At', type: 'datetime_immutable')]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(name: 'updated_At', type: 'datetime_immutable', nullable: true)]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'conseil')]
+    #[ORM\ManyToOne(inversedBy: 'conseils')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
     /**
      * @var Collection<int, TempsConseil>
      */
-    #[ORM\OneToMany(targetEntity: TempsConseil::class, mappedBy: 'Conseil', orphanRemoval: true)]
-    private Collection $tempsConseils;
+    #[ORM\OneToMany(targetEntity: TempsConseil::class, mappedBy: 'conseil', orphanRemoval: true)]
+    private Collection $TempsConseils;
 
     public function __construct()
     {
-        $this->tempsConseils = new ArrayCollection();
+        $this->TempsConseils = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -57,24 +58,24 @@ class conseil
         return $this;
     }
 
-       public function getCreatedAt(): ?\DateTimeImmutable
+       public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(?DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 
@@ -98,13 +99,13 @@ class conseil
      */
     public function getTempsConseils(): Collection
     {
-        return $this->tempsConseils;
+        return $this->TempsConseils;
     }
 
     public function addTempsConseil(TempsConseil $tempsConseil): static
     {
-        if (!$this->tempsConseils->contains($tempsConseil)) {
-            $this->tempsConseils->add($tempsConseil);
+        if (!$this->TempsConseils->contains($tempsConseil)) {
+            $this->TempsConseils->add($tempsConseil);
             $tempsConseil->setConseil($this);
         }
 
@@ -113,13 +114,9 @@ class conseil
 
     public function removeTempsConseil(TempsConseil $tempsConseil): static
     {
-        if ($this->tempsConseils->removeElement($tempsConseil)) {
-            // set the owning side to null (unless already changed)
-            if ($tempsConseil->getConseil() === $this) {
-                $tempsConseil->setConseil(null);
-            }
+        if ($this->TempsConseils->removeElement($tempsConseil) && $tempsConseil->getConseil() === $this) {
+            $tempsConseil->setConseil(null);
         }
-
         return $this;
     }
 
@@ -134,7 +131,7 @@ class conseil
             'contenu'     => method_exists($this, 'getContenu') ? $this->getContenu() : null,
             'auteurEmail' => $this->getUser()?->getEmail(),
             'temps'       => array_map(
-                fn($t) => [
+               static fn($t) => [
                     'id'     => $t->getId(),
                     'mois'   => $t->getMois(),
                     'annee'  => $t->getAnnee(),
