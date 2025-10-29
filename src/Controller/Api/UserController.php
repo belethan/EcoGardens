@@ -83,13 +83,14 @@ final class UserController extends AbstractController
                 'email' => $user->getEmail(),
                 'ville' => $user->getVille(),
                 'code_postal' => $user->getCodePostal(),
-                'created_at' => $user->getCreatedAt()->format('Y-m-d H:i:s'),
+                'created_at' => $user->getCreatedAt()
+                    ? $user->getCreatedAt()->format('Y-m-d H:i:s')
+                    : null,
             ]
         ], 201);
     }
 
     #[Route('/api/user/{id}', name: 'api.userupdate', methods: ['PUT'])]
-    #[IsGranted('ROLE_USER')]
     public function updateUser(
         int $id,
         Request $request,

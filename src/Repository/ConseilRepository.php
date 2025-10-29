@@ -54,7 +54,9 @@ class ConseilRepository extends ServiceEntityRepository
             ->andWhere('t.conseil = :c')
             ->andWhere('t.mois = :m')
             ->andWhere('t.annee = :a')
-            ->setParameters(['c' => $conseil, 'm' => $mois, 'a' => $annee])
+            ->setParameter('c', $conseil)
+            ->setParameter('m', $mois)
+            ->setParameter('a', $annee)
             ->setMaxResults(1)
             ->getQuery()
             ->getOneOrNullResult();

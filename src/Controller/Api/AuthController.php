@@ -4,14 +4,15 @@ namespace App\Controller\Api;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
 use App\Entity\User;
 use Lexik\Bundle\JWTAuthenticationBundle\Services\JWTTokenManagerInterface;
+use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/api/auth', name: 'api.auth')]
 class AuthController extends AbstractController
 {
-    #[Route('/api/auth', name: 'api.auth', methods: ['POST'])]
+    #[Route('', name: 'api.index', methods: ['POST'])]
     public function auth(
         #[CurrentUser] ?User $user,
         JWTTokenManagerInterface $jwtManager

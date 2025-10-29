@@ -6,12 +6,14 @@ use App\Entity\Conseil;
 use App\Entity\TempsConseil;
 use App\Repository\ConseilRepository;
 use App\Repository\TempsConseilRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 final class ConseilController extends AbstractController
@@ -34,7 +36,7 @@ final class ConseilController extends AbstractController
         }
         $conseils = $conseilRepository->findForCurrentMonth();
         // 🔹 Utilisation directe de la méthode toApiArray() de l'entité Conseil
-        $data = array_map(fn($conseil) => $conseil->toApiArray(), $conseils);
+        $data = array_map(static fn($conseil) => $conseil->toApiArray(), $conseils);
 
         return new JsonResponse($data, Response::HTTP_OK);
     }
@@ -71,12 +73,12 @@ final class ConseilController extends AbstractController
                 return $c->toApiArray();
             }
 
-            // Sinon on construit un tableau minimal + email de l’auteur
+            // Sinon, on construit un tableau minimal + email de l’auteur
             return [
                 'id'          => $c->getId(),
                 'contenu'     => method_exists($c, 'getContenu') ? $c->getContenu() : null,
                 'auteurEmail' => method_exists($c, 'getUser') ? ($c->getUser()?->getEmail()) : null,
-                // on renvoie les périodes (il peut y en avoir plusieurs)
+                // on renvoie les périodes (il peut y en avoir plusieurs,)
                 'temps'       => array_map(static fn($t) => [
                     'mois'  => $t->getMois(),
                     'annee' => $t->getAnnee(),
@@ -116,8 +118,12 @@ final class ConseilController extends AbstractController
             // Création du conseil
             $conseil = new Conseil();
             $conseil->setContenu($data['texte']);
-            $conseil->setUser($user);
-            $conseil->setCreatedAt(new \DateTimeImmutable());
+            // Protection, car symfony pourrait renvoyer n’importe quel objet implémentant
+            if ($user instanceof \App\Entity\User) {
+                $conseil->setUser($user);
+            }
+
+            $conseil->setCreatedAt(new DateTimeImmutable());
 
             $em->persist($conseil);
 
@@ -152,7 +158,7 @@ final class ConseilController extends AbstractController
                 ]
             ], Response::HTTP_CREATED);
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->json([
                 'error' => 'Erreur lors de l’ajout du conseil : ' . $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
