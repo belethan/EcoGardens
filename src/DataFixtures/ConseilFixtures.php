@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\conseil;
-use App\Entity\TempsConseil;
+use App\Entity\tempsConseil;
 use App\Entity\User;
 use App\Faker\Provider\EcoGardensProvider;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -24,10 +24,10 @@ class ConseilFixtures extends Fixture
     {
         $faker = Factory::create('fr_FR');
 
-        // ✅ Ajout du provider EcoGardens
+        // Ajout du provider EcoGardens
         $faker->addProvider(new EcoGardensProvider($faker));
 
-        // 1️⃣ Récupérer les utilisateurs existants
+        // Récupérer les utilisateurs existants
         $users = $this->em->getRepository(User::class)->findAll();
 
         if (empty($users)) {
@@ -36,7 +36,7 @@ class ConseilFixtures extends Fixture
             return;
         }
 
-        // 2️⃣ Créer plusieurs conseils basés sur le vocabulaire des plantes
+        // ⃣ Créer plusieurs conseils basés sur le vocabulaire des plantes
         for ($i = 1; $i <= 8; $i++) {
             $conseil = new conseil();
 
@@ -57,13 +57,13 @@ class ConseilFixtures extends Fixture
 
             $manager->persist($conseil);
 
-            // 3️⃣ Crée entre 1 et 2 périodes associées (mois/année)
+            //  Crée entre 1 et 2 périodes associées (mois/année)
             $nbPeriodes = rand(1, 2);
             for ($j = 0; $j < $nbPeriodes; $j++) {
                 $mois = rand(1, 12);
                 $annee = rand(2023, 2025);
 
-                $temps = new TempsConseil();
+                $temps = new tempsConseil();
                 $temps->setMois($mois);
                 $temps->setAnnee($annee);
                 $temps->setConseil($conseil);
@@ -74,6 +74,6 @@ class ConseilFixtures extends Fixture
 
         $manager->flush();
 
-        echo "\n✅ Conseils EcoGardens créés avec succès à partir des utilisateurs existants !\n";
+        echo "\n Conseils EcoGardens créés avec succès à partir des utilisateurs existants !\n";
     }
 }

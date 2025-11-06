@@ -13,15 +13,16 @@ Toutes les réponses sont au format JSON, avec une gestion stricte des codes d�
 
 Contient les informations de chaque utilisateur de l’API.
 
-| Champ | Type | Description |
-|-------|------|-------------|
-| id | INT (PK, AI) | Identifiant unique |
-| email | VARCHAR(255) | Adresse email de l'utilisateur |
-| password | VARCHAR(255) | Mot de passe haché |
-| ville | VARCHAR(100) | Ville de l'utilisateur |
+| Champ       | Type                    | Description                               |
+|-------------|-------------------------|-------------------------------------------|
+| id          | INT (PK, AI)            | Identifiant unique                        |
+| email       | VARCHAR(255)            | Adresse email de l'utilisateur            |
+| password    | VARCHAR(255)            | Mot de passe haché                        |
+| ville       | VARCHAR(100)            | Ville de l'utilisateur                    |
 | code_postal | VARCHAR(10) (optionnel) | Pour identifier plus précisément la ville |
-| created_at | DATETIME | Date de création du compte |
-| updated_at | DATETIME | Dernière mise à jour |
+| roles       | JSON                    | Pour avenir valeur par ROLE_USER          |
+| created_at  | DATETIME                | Date de création du compte                |
+| updated_at  | DATETIME                | Dernière mise à jour                      |
 
 
 Remarques :
@@ -30,14 +31,13 @@ Les routes /user, /auth, /user/{id} manipulent cette table.
 
 2. 💡Conseil
 
+
 Contient les conseils de jardinage.
 
 | Champ | Type | Description |
 |-------|------|-------------|
 | id | INT (PK, AI) | Identifiant du conseil |
 | contenu | TEXT | Contenu du conseil |
-| mois | INT | N° du mois |
-| annee | INT | Année associée au mois plus de précision |
 | created_at | DATETIME | Date de création |
 | updated_at | DATETIME | Date de mise à jour |
 | user_id | INT | Identifiant de l'utilisateur |
@@ -46,16 +46,31 @@ Remarques :
 Accessible via /conseil/{mois} ou /conseil/.
 Modifiable uniquement par un administrateur.
 
-👮‍♀️ 2. <span style="color: #F8BBD9;">Logique métier</span>
+3. 💡Temps_Conseil
 
-Lorsqu’on insère un nouveau conseil, le champ mois est calculé à partir de la colonne created_at
+   | Colonne      | Type | Attributs           | Description                                      |
+   |---------------|------|--------------------|--------------------------------------------------|
+   | **id**        | int  | AUTO_INCREMENT, PK | Identifiant unique de l’enregistrement            |
+   | **conseil_id**| int  | NOT NULL, FK       | Référence à l’identifiant du conseil associé      |
+   | **mois**      | int  | NOT NULL           | Mois concerné par le conseil (1 = janvier, etc.) |
+   | **annee**     | int  | NOT NULL           | Année concernée par le conseil                   |
 
-👉 MONTH(NEW.created_at)
-et annee via YEAR(NEW.created_at).
+### Contraintes et relations
+- **Clé primaire :** `id`
+- **Clé étrangère :** `conseil_id` → `conseil(id)`  
+  → Assure la cohérence avec la table `conseil` (suppression/mise à jour en cascade selon la config Doctrine).
 
-Lorsqu’on met à jour un conseil (modification du texte ou autre), si updated_at change, on recalcule mois et annee depuis cette date.
+### Exemple d’utilisation
+Chaque ligne de `temps_conseil` relie un **conseil** à un **mois/année** spécifique, permettant d’associer un même conseil à plusieurs périodes.
+
+
 
 ## <span style="color: blue">🧩 Authentification</span>
+
+👮‍♀️ il existe 2 manières de s'authentifier :
+- **Authentification par email et mot de passe**
+- **Authentification par token JWT**
+
 Le JWT (JSON Web Token) est un jeton signé (souvent via HS256) qui contient des informations sur un utilisateur, comme son id ou son email.
 Une fois généré à la connexion, il permet d’accéder à des routes protégées sans session, ni cookie.
 

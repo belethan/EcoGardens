@@ -49,12 +49,12 @@ class UserPasswordHasherListener
 
         $mustRehash = false;
 
-        // ✅ Si le mot de passe a été modifié
+        // Si le mot de passe a été modifié
         if ($args->hasChangedField('password')) {
             $mustRehash = true;
         }
 
-        // ✅ Si l'email a été modifié, on rehash aussi le mot de passe
+        // Si l'email a été modifié, on rehash aussi le mot de passe
         if ($args->hasChangedField('email')) {
             $mustRehash = true;
         }
@@ -67,7 +67,7 @@ class UserPasswordHasherListener
                 $hashed = $this->passwordHasher->hashPassword($entity, $plainPassword);
                 $entity->setPassword($hashed);
 
-                // ⚠️ Doctrine doit être informé que le champ a changé
+
                 $em = $args->getObjectManager();
                 $classMetadata = $em->getClassMetadata(User::class);
                 $em->getUnitOfWork()->recomputeSingleEntityChangeSet($classMetadata, $entity);

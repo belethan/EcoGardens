@@ -2,11 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\TempsConseilRepository;
+use App\Repository\tempsConseilRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: TempsConseilRepository::class)]
-class TempsConseil
+#[ORM\Entity(repositoryClass: tempsConseilRepository::class)]
+class tempsConseil
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -19,7 +19,7 @@ class TempsConseil
     #[ORM\Column]
     private ?int $annee = null;
 
-    #[ORM\ManyToOne(targetEntity: Conseil::class, inversedBy: 'TempsConseils')]
+    #[ORM\ManyToOne(targetEntity: Conseil::class, inversedBy: 'tempsConseils')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Conseil $conseil = null;
 

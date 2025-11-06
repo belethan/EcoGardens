@@ -3,9 +3,9 @@
 namespace App\Controller\Api;
 
 use App\Entity\Conseil;
-use App\Entity\TempsConseil;
+use App\Entity\tempsConseil;
 use App\Repository\ConseilRepository;
-use App\Repository\TempsConseilRepository;
+use App\Repository\tempsConseilRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -133,10 +133,10 @@ final class ConseilController extends AbstractController
                     continue;
                 }
 
-                $tempsConseil = new TempsConseil();
+                $tempsConseil = new tempsConseil();
                 $tempsConseil->setMois((int) $moisInfo['mois']);
                 $tempsConseil->setAnnee((int) $moisInfo['annee']);
-                $conseil->addTempsConseil($tempsConseil); // ✅ relation synchronisée dans les deux sens
+                $conseil->addTempsConseil($tempsConseil); // relation synchronisée dans les deux sens
 
                 $em->persist($tempsConseil);
             }
@@ -217,7 +217,7 @@ final class ConseilController extends AbstractController
         int $id,
         Request $request,
         EntityManagerInterface $em,
-        TempsConseilRepository $tempsRepo
+        tempsConseilRepository $tempsRepo
     ): Response {
         $data = json_decode($request->getContent(), true);
         if (!is_array($data)) {
@@ -311,7 +311,7 @@ final class ConseilController extends AbstractController
                             'reason' => 'Déjà présent — pas de doublon.'
                         ];
                     } else {
-                        $t = new TempsConseil();
+                        $t = new tempsConseil();
                         $t->setConseil($conseil);
                         $t->setMois($absMois);
                         $t->setAnnee($annee);
@@ -319,7 +319,7 @@ final class ConseilController extends AbstractController
                         $changes['added'][] = [
                             'mois' => $absMois,
                             'annee' => $annee,
-                            'source' => isset($row['annee']) ? 'fourni' : 'auto' // 👈 info utile
+                            'source' => isset($row['annee']) ? 'fourni' : 'auto'
                         ];
                     }
                 }
@@ -335,7 +335,7 @@ final class ConseilController extends AbstractController
                 'id' => $conseil->getId(),
                 'contenu' => $conseil->getContenu(),
                 'mois_associes' => array_map(
-                    fn(TempsConseil $t) => ['mois' => $t->getMois(), 'annee' => $t->getAnnee()],
+                    fn(tempsConseil $t) => ['mois' => $t->getMois(), 'annee' => $t->getAnnee()],
                     $conseil->getTempsConseils()->toArray()
                 ),
             ],

@@ -33,12 +33,12 @@ class Conseil
     /**
      * @var Collection<int, TempsConseil>
      */
-    #[ORM\OneToMany(targetEntity: TempsConseil::class, mappedBy: 'conseil', orphanRemoval: true)]
-    private Collection $TempsConseils;
+    #[ORM\OneToMany(targetEntity: tempsConseil::class, mappedBy: 'conseil', orphanRemoval: true)]
+    private Collection $tempsConseils;
 
     public function __construct()
     {
-        $this->TempsConseils = new ArrayCollection();
+        $this->tempsConseils = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -99,22 +99,22 @@ class Conseil
      */
     public function getTempsConseils(): Collection
     {
-        return $this->TempsConseils;
+        return $this->tempsConseils;
     }
 
-    public function addTempsConseil(TempsConseil $tempsConseil): static
+    public function addTempsConseil(tempsConseil $tempsConseil): static
     {
-        if (!$this->TempsConseils->contains($tempsConseil)) {
-            $this->TempsConseils->add($tempsConseil);
+        if (!$this->tempsConseils->contains($tempsConseil)) {
+            $this->tempsConseils->add($tempsConseil);
             $tempsConseil->setConseil($this);
         }
 
         return $this;
     }
 
-    public function removeTempsConseil(TempsConseil $tempsConseil): static
+    public function removeTempsConseil(tempsConseil $tempsConseil): static
     {
-        if ($this->TempsConseils->removeElement($tempsConseil) && $tempsConseil->getConseil() === $this) {
+        if ($this->tempsConseils->removeElement($tempsConseil) && $tempsConseil->getConseil() === $this) {
             $tempsConseil->setConseil(null);
         }
         return $this;

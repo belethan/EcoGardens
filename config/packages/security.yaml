@@ -1,0 +1,71 @@
+security:
+    # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
+    password_hashers:
+        App\Entity\User:
+            algorithm: auto
+    # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
+    providers:
+        app_user_provider:
+            entity:
+                class: App\Entity\User
+                property: email
+
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+
+        # --- Authentification via JSON (JWT Login) ---
+        login:
+            pattern: ^/api/auth
+            stateless: true
+            provider: app_user_provider
+            json_login:
+                check_path: /api/auth
+                username_path: email
+                password_path: password
+                success_handler: lexik_jwt_authentication.handler.authentication_success
+                failure_handler: lexik_jwt_authentication.handler.authentication_failure
+
+        # --- Route publique pour la création d’un user ---
+        register:
+            pattern: ^/api/user
+            stateless: true
+            security: false
+
+        # --- Authentification JWT sur toutes les autres routes /api ---
+        api:
+            pattern: ^/api
+            stateless: true
+            provider: app_user_provider
+            jwt: ~
+
+
+    # Easy way to control access for large sections of your site
+    # Note: Only the *first* access control that matches will be used
+    access_control:
+        # Routes accessibles sans authentification
+        - { path: ^/api/user$, roles: PUBLIC_ACCESS } # création de compte
+        - { path: ^/api/auth$, roles: PUBLIC_ACCESS } # création token JWT
+
+        # Accès simple email/password uniquement pour 2 contrôleurs Conseil/Météo (GET)
+        - { path: ^/api/(meteo|conseil)(/|$), roles: IS_AUTHENTICATED_FULLY }
+        - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
+
+        # Accès restreints aux connexion avec token JWT
+        - { path: ^/api/auth/conseil, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT, DELETE] }
+        - { path: ^/api/auth/user, roles: IS_AUTHENTICATED_FULLY, methods: [PUT, DELETE] }
+
+
+when@test:
+    security:
+        password_hashers:
+            # By default, password hashers are resource intensive and take time. This is
+            # important to generate secure password hashes. In tests however, secure hashes
+            # are not important, waste resources and increase test times. The following
+            # reduces the work factor to the lowest possible values.
+            Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface:
+                algorithm: auto
+                cost: 4 # Lowest possible value for bcrypt
+                time_cost: 3 # Lowest possible value for argon
+                memory_cost: 10 # Lowest possible value for argon
