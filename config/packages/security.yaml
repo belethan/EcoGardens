@@ -20,6 +20,7 @@ security:
             pattern: ^/api/auth
             stateless: true
             provider: app_user_provider
+            jwt: ~
             json_login:
                 check_path: /api/auth
                 username_path: email
@@ -44,17 +45,17 @@ security:
     # Easy way to control access for large sections of your site
     # Note: Only the *first* access control that matches will be used
     access_control:
+        # Accès restreints aux connexion avec token JWT
+        - { path: ^/api/auth/conseil, roles: IS_AUTHENTICATED_FULLY, methods: [ POST, PUT, DELETE ] }
+        - { path: ^/api/auth/user, roles: IS_AUTHENTICATED_FULLY, methods: [ PUT, DELETE ] }
+
         # Routes accessibles sans authentification
         - { path: ^/api/user$, roles: PUBLIC_ACCESS } # création de compte
         - { path: ^/api/auth$, roles: PUBLIC_ACCESS } # création token JWT
 
         # Accès simple email/password uniquement pour 2 contrôleurs Conseil/Météo (GET)
         - { path: ^/api/(meteo|conseil)(/|$), roles: IS_AUTHENTICATED_FULLY }
-        - { path: ^/api/, roles: IS_AUTHENTICATED_FULLY }
-
-        # Accès restreints aux connexion avec token JWT
-        - { path: ^/api/auth/conseil, roles: IS_AUTHENTICATED_FULLY, methods: [POST, PUT, DELETE] }
-        - { path: ^/api/auth/user, roles: IS_AUTHENTICATED_FULLY, methods: [PUT, DELETE] }
+        - { path: ^/api/, roles: PUBLIC_ACCESS }
 
 
 when@test:
