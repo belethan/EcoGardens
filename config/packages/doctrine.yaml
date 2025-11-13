@@ -1,13 +1,9 @@
 doctrine:
     dbal:
         url: '%env(resolve:DATABASE_URL)%'
-
-        # IMPORTANT: You MUST configure your server version,
-        # either here or in the DATABASE_URL env var (see .env file)
-        #server_version: '16'
-
         profiling_collect_backtrace: '%kernel.debug%'
         use_savepoints: true
+
     orm:
         auto_generate_proxy_classes: true
         enable_lazy_ghost_objects: true
@@ -17,6 +13,7 @@ doctrine:
         identity_generation_preferences:
             Doctrine\DBAL\Platforms\PostgreSQLPlatform: identity
         auto_mapping: true
+
         mappings:
             App:
                 type: attribute
@@ -24,15 +21,38 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Entity'
                 prefix: 'App\Entity'
                 alias: App
+
         controller_resolver:
             auto_mapping: false
 
+        # ----------------------------------------------
+        #  Activation du cache Doctrine via Redis (DEV)
+        # ----------------------------------------------
+        metadata_cache_driver:
+            type: pool
+            pool: doctrine.system_cache_pool
+
+        query_cache_driver:
+            type: pool
+            pool: doctrine.system_cache_pool
+
+        result_cache_driver:
+            type: pool
+            pool: doctrine.result_cache_pool
+
+
+# ----------------------------------------------
+#  Configuration TEST
+# ----------------------------------------------
 when@test:
     doctrine:
         dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
             dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
+
+# ----------------------------------------------
+#  Configuration PROD (optimisée)
+# ----------------------------------------------
 when@prod:
     doctrine:
         orm:
@@ -48,7 +68,26 @@ when@prod:
     framework:
         cache:
             pools:
-                doctrine.result_cache_pool:
-                    adapter: cache.app
                 doctrine.system_cache_pool:
-                    adapter: cache.system
+                    adapter: cache.adapter.redis
+                    provider: 'redis://127.0.0.1:6379'
+
+                doctrine.result_cache_pool:
+                    adapter: cache.adapter.redis
+                    provider: 'redis://127.0.0.1:6379'
+
+
+# ----------------------------------------------
+#  Configuration DEV du cache Redis
+# (nécessaire car sinon fallback → REDIS !)
+# ----------------------------------------------
+framework:
+    cache:
+        pools:
+            doctrine.system_cache_pool:
+                adapter: cache.adapter.redis
+                provider: 'redis://127.0.0.1:6379'
+
+            doctrine.result_cache_pool:
+                adapter: cache.adapter.redis
+                provider: 'redis://127.0.0.1:6379'

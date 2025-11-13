@@ -42,7 +42,7 @@ class MeteoController extends AbstractController
         }
 
         try {
-            // Étape 2 : appel au service MeteoClient (avec cache memcached)
+            // Étape 2 : appel au service MeteoClient (avec REDIS)
             //$data = $this->meteoClient->fetchBasicWeather($ville);
             $data = $this->meteoClient->fetchWeather($ville);
             if (!$data) {

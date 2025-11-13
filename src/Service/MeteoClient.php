@@ -125,7 +125,7 @@ class MeteoClient
             return $response->toArray(false);
 
         } catch (\Exception $e) {
-            $this->logger?->error("💥 Erreur lors de la récupération météo basic URL", [
+            $this->logger?->error("Erreur lors de la récupération météo basic URL", [
                 'ville' => $city,
                 'erreur' => $e->getMessage(),
             ]);

@@ -1,12 +1,37 @@
-# see https://symfony.com/doc/current/reference/configuration/framework.html
 framework:
     secret: '%env(APP_SECRET)%'
 
-    # Note that the session will be started ONLY if you read or write from it.
-    session: true
+    # Sessions — activation automatique si nécessaire
+    session:
+        enabled: true
+        handler_id: 'redis://127.0.0.1:6379'
+        cookie_secure: auto
+        cookie_samesite: lax
 
-    #esi: true
-    #fragments: true
+    # Cache application et système → Redis (évite tout fallback Memcached !)
+    cache:
+        default_memcached_provider: null
+        app: cache.adapter.redis
+        system: cache.adapter.redis
+
+        default_redis_provider: 'redis://127.0.0.1:6379'
+
+        pools:
+            doctrine.system_cache_pool:
+                adapter: cache.adapter.redis
+                provider: 'redis://127.0.0.1:6379'
+
+            doctrine.result_cache_pool:
+                adapter: cache.adapter.redis
+                provider: 'redis://127.0.0.1:6379'
+
+    # Router
+    router:
+        utf8: true
+
+    # HTTP method override (PUT/DELETE depuis formulaires HTML)
+    http_method_override: true
+
 
 when@test:
     framework:
