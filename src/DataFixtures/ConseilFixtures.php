@@ -3,7 +3,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\conseil;
-use App\Entity\tempsConseil;
+use App\Entity\TempsConseil;
 use App\Entity\User;
 use App\Faker\Provider\EcoGardensProvider;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -31,7 +31,7 @@ class ConseilFixtures extends Fixture
         $users = $this->em->getRepository(User::class)->findAll();
 
         if (empty($users)) {
-            echo "\n⚠️ Aucun utilisateur trouvé en base. "
+            echo "\n️ Aucun utilisateur trouvé en base. "
                 . "Les conseils ne seront pas créés.\n";
             return;
         }
@@ -58,10 +58,10 @@ class ConseilFixtures extends Fixture
             $manager->persist($conseil);
 
             //  Crée entre 1 et 2 périodes associées (mois/année)
-            $nbPeriodes = rand(1, 2);
+            $nbPeriodes = random_int(1, 2);
             for ($j = 0; $j < $nbPeriodes; $j++) {
-                $mois = rand(1, 12);
-                $annee = rand(2023, 2025);
+                $mois = random_int(1, 12);
+                $annee = random_int(2023, 2025);
 
                 $temps = new tempsConseil();
                 $temps->setMois($mois);

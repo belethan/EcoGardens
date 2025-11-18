@@ -83,7 +83,7 @@ class MeteoClient
                 return $data;
             });
         } catch (\Throwable $e) {
-            $this->logger?->error("💥 Erreur lors de la récupération météo", [
+            $this->logger?->error("Erreur lors de la récupération météo", [
                 'ville' => $city,
                 'clé' => $cacheKey,
                 'erreur' => $e->getMessage(),

@@ -2,18 +2,18 @@
 
 namespace App\Repository;
 
-use App\Entity\tempsConseil;
+use App\Entity\TempsConseil;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<tempsConseil>
+ * @extends ServiceEntityRepository<TempsConseil>
  */
 class tempsConseilRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, tempsConseil::class);
+        parent::__construct($registry, TempsConseil::class);
     }
 
     //    /**

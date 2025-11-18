@@ -33,7 +33,7 @@ class Conseil
     /**
      * @var Collection<int, TempsConseil>
      */
-    #[ORM\OneToMany(targetEntity: tempsConseil::class, mappedBy: 'conseil', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: TempsConseil::class, mappedBy: 'conseil', orphanRemoval: true)]
     private Collection $tempsConseils;
 
     public function __construct()
